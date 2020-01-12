@@ -1,14 +1,12 @@
 const path = require('path');
-
 const express = require('express');
-
+const auth = require('../middleware/auth');
 const atecController = require('../controllers/atec');
-
 const router = express.Router();
 
-router.get('/atec', atecController.getAll);
-router.get('/atec/detail/:id', atecController.detail);
-router.get('/atec/userId/:id', atecController.getByUser);
+router.get('/atec', auth, atecController.getAll);
+router.get('/atec/detail/:id', auth, atecController.detail);
+router.get('/atec/userId/:id', auth, atecController.getByUser);
 // router.get('/atec/form', atecController.getByUser);
 
 

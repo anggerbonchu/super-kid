@@ -1,19 +1,26 @@
 const jwt = require('jsonwebtoken')
+const Response = require('../config/response');
 const User = require('../models/user')
 
 const auth = async(req, res, next) => {
-    const token = req.header('Authorization').replace('Bearer ', '')
-    const data = jwt.verify(token, process.env.JWT_KEY)
     try {
-        const user = User.findOne({ _id: data._id})
-        if (!user) {
-            throw new Error()
+        if (typeof req.headers.authorization !== "undefined") {
+            // JWT using the split function
+            let token = req.headers.authorization.split(" ")[1];
+            let data = jwt.verify(token, process.env.JWT_KEY)
+            // Here we validate that the JSON Web Token is valid and has been 
+            let user = User.findOne({ _id: data._id})
+            if (!user) {
+                throw new Error("Not authorized to access this resource");
+            }
+            req.user = user
+            req.token = token
+            next()
+        }else {
+            throw new Error("Not authorized to access this resource");
         }
-        req.user = user
-        req.token = token
-        next()
     } catch (error) {
-        res.status(401).send({ error: 'Not authorized to access this resource' })
+        Response.send('', res, error.message);
     }
 
 }

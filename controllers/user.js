@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const Response = require('../config/response');
 const ValidationResult = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 exports.getAll = (req, res) => {
     User
@@ -49,14 +51,30 @@ exports.delete = function(req, res) {
 exports.login = function(req, res) {
     try {
         const { email, password } = req.body
-        const user = User.findByCredentials(email, password)
-        if (!user) {
-            return res.status(401).send({error: 'Login failed! Check authentication credentials'})
-        }
-        const token = user.generateAuthToken()
-        res.send({ user, token })
+        User.findOne({email}, (err, user) => {
+            if (!err && user) {
+                console.log('masuk');
+              // We could compare passwords in our model instead of below
+              bcrypt.compare(password, user.password).then(match => {
+                if (!match) {
+                    throw new Error("Not authorized to access this resource");
+                }
+
+                const payload = { user: user.name };
+                const options = { expiresIn: '2d', issuer: 'https://scotch.io' };
+                const secret = process.env.JWT_KEY;
+                const token = jwt.sign(payload, secret, options);
+                res.send({ user, token })
+              }).catch(err => {
+                  console.log(err);
+                Response.send('', res, 'Login failed! Check authentication credentials');
+              });
+            } else {
+                Response.send('', res, 'Login failed! Check authentication credentials');
+            }
+        });
     } catch (error) {
-        res.status(400).send(error)
+        Response.send('', res, error.message);
     }
 };
 

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 
 const Schema = mongoose.Schema;
 
@@ -34,18 +33,6 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-userSchema.statics.findByCredentials = async (email, password) => {
-  // Search for a user by email and password.
-  const user = await User.findOne({ email} )
-  if (!user) {
-      throw new Error({ error: 'Invalid login credentials' })
-  }
-  const isPasswordMatch = await bcrypt.compare(password, user.password)
-  if (!isPasswordMatch) {
-      throw new Error({ error: 'Invalid login credentials' })
-  }
-  return user
-}
 // userSchema.methods.addKid = function(kid) {
 //   const updatedKids = [...this.kids];
 //   updatedKids.push({
@@ -57,4 +44,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 //   return this.save();
 // }
 
-module.exports = mongoose.model('User', userSchema);
+// module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema)
+
+module.exports = User
