@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs')
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const Schema = mongoose.Schema;
 
@@ -19,19 +19,19 @@ const userSchema = new Schema({
     {
       name: String,
       gender: String,
-      birthday: Date,
+      birthday: Date
     }
-  ],
+  ]
 });
 
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function(next) {
   // Hash the password before saving the user model
-  const user = this
-  if (user.isModified('password')) {
-      user.password = await bcrypt.hash(user.password, 8)
+  const user = this;
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, 8);
   }
-  next()
-})
+  next();
+});
 
 // userSchema.methods.addKid = function(kid) {
 //   const updatedKids = [...this.kids];
@@ -44,7 +44,12 @@ userSchema.pre('save', async function (next) {
 //   return this.save();
 // }
 
-// module.exports = mongoose.model('User', userSchema);
-const User = mongoose.model('User', userSchema)
+userSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 
-module.exports = User
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
