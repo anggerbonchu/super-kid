@@ -33,17 +33,6 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
-// userSchema.methods.addKid = function(kid) {
-//   const updatedKids = [...this.kids];
-//   updatedKids.push({
-//     name: kid.name,
-//     gender: kid.gender,
-//     birthday: kid.birthday
-//   });
-//   this.kids = updatedKids;
-//   return this.save();
-// }
-
 userSchema.methods.toJSON = function() {
   var obj = this.toObject();
   delete obj.password;

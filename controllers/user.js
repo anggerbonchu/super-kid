@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 exports.getAll = (req, res) => {
   User.find()
-    .then(data => {
+    .then(function(data){
       Response.send(data, res);
     })
     .catch(err => {
@@ -16,7 +16,7 @@ exports.getAll = (req, res) => {
 
 exports.detail = function(req, res) {
   User.findOne({ _id: req.params.id })
-    .then(function(data) {
+    .then(function(data){
       Response.send(data, res);
     })
     .catch(err => {
@@ -39,6 +39,23 @@ exports.create = function(req, res) {
     });
 };
 
+exports.addKid = (req, res, next) => {
+  let id = req.body.id;
+  let kid = {
+    name: req.body.name,
+    gender: req.body.gender,
+    birthday: req.body.birthday
+  }
+
+  User.findOneAndUpdate({ _id: id }, { $push: { kids: kid } }, {new: true})
+    .then(function(data){
+      Response.send(data, res);
+    }).catch(err => {
+      Response.send("", res, err);
+    });
+ 
+}
+
 exports.delete = function(req, res) {
   User.deleteOne({ _id: req.params.id })
     .then(user => {
@@ -53,7 +70,6 @@ exports.login = function(req, res) {
   try {
     const { email, password } = req.body;
     User.findOne({ email }, (err, user) => {
-      console.log(user);
       if (!err && user) {
         // We could compare passwords in our model instead of below
         bcrypt
@@ -161,3 +177,5 @@ exports.changePassword = function(req, res) {
     res.status(500).send(error);
   }
 };
+
+
