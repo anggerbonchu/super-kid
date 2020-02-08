@@ -40,20 +40,40 @@ exports.create = function(req, res) {
 };
 
 exports.addKid = (req, res, next) => {
-  let id = req.body.id;
+  let id_user = req.body.id_user;
   let kid = {
     name: req.body.name,
     gender: req.body.gender,
     birthday: req.body.birthday
   }
 
-  User.findOneAndUpdate({ _id: id }, { $push: { kids: kid } }, {new: true})
+  User.findOneAndUpdate({ _id: id_user }, { $push: { kids: kid } }, {new: true})
     .then(function(data){
       Response.send(data, res);
     }).catch(err => {
       Response.send("", res, err);
     });
  
+};
+
+exports.updateKid = (req, res) => {
+  let id = req.params.id;
+  let { name, gender, birthday, id_user } = req.body;
+
+  User.findOneAndUpdate({
+          "_id": id_user, "kids._id" : id 
+        }, { 
+            $set: { 
+              "kids.$.name": name,
+              "kids.$.gender": gender,
+              "kids.$.birthday": birthday
+            } 
+        }, {new: true})
+    .then(function(data){
+      Response.send(data, res);
+    }).catch(err => {
+        Response.send("", res, err);
+    });
 }
 
 exports.delete = function(req, res) {
