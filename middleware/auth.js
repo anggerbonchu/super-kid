@@ -7,15 +7,16 @@ const auth = async (req, res, next) => {
     if (typeof req.headers.authorization !== "undefined") {
       // JWT using the split function
       let token = req.headers.authorization.split(" ")[1];
-      let data = jwt.verify(token, process.env.JWT_KEY);
+      let decode = jwt.verify(token, process.env.JWT_KEY);
       // Here we validate that the JSON Web Token is valid and has been
-      let user = User.findOne({ _id: data._id });
-      if (!user) {
+      var userId = decode.id;
+      User.findOne({ _id: userId }).then(function(user){
+        req.user = user;
+        req.token = token;
+        next();
+      }).catch(err => {
         throw new Error("Not authorized to access this resource");
-      }
-      req.user = user;
-      req.token = token;
-      next();
+      })
     } else {
       throw new Error("Not authorized to access this resource");
     }

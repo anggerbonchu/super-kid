@@ -99,7 +99,7 @@ exports.login = function(req, res) {
               throw new Error("Not authorized to access this resource");
             }
 
-            const payload = { user: user.name };
+            const payload = { id: user.id };
             const options = { expiresIn: "2d", issuer: "https://scotch.io" };
             const secret = process.env.JWT_KEY;
             const token = jwt.sign(payload, secret, options);
@@ -123,16 +123,6 @@ exports.login = function(req, res) {
     });
   } catch (error) {
     Response.send("", res, error.message);
-  }
-};
-
-exports.logout = function(req, res) {
-  try {
-    req.user.tokens.splice(0, req.user.tokens.length);
-    req.user.save();
-    res.send();
-  } catch (error) {
-    res.status(500).send(error);
   }
 };
 

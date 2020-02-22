@@ -2,6 +2,7 @@ const Atec = require("../models/atec");
 const Response = require("../config/response");
 
 exports.getAll = (req, res) => {
+  console.log(req.user);
   Atec.find()
     .then(data => {
       Response.send(data, res);
@@ -122,6 +123,16 @@ exports.create = function(req, res) {
     .save()
     .then(function() {
       Response.send(atec, res);
+    })
+    .catch(err => {
+      Response.send("", res, err);
+    });
+};
+
+exports.delete = function(req, res) {
+  Atec.deleteOne({ _id: req.params.id })
+    .then(function(data) {
+      Response.send(data, res);
     })
     .catch(err => {
       Response.send("", res, err);
