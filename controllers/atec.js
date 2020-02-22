@@ -2,7 +2,6 @@ const Atec = require("../models/atec");
 const Response = require("../config/response");
 
 exports.getAll = (req, res) => {
-  console.log(req.user);
   Atec.find()
     .then(data => {
       Response.send(data, res);
