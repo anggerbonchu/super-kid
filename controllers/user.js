@@ -25,18 +25,30 @@ exports.detail = function(req, res) {
 };
 
 exports.create = function(req, res) {
-  let user = new User();
-  user.email = req.body.email;
-  user.password = req.body.password;
+    const email = req.body.email;
+    User.findOne({ email }, (err, user) => {
+      if (!err && user) {
+        Response.send("", res, "Email is already registered.");
+      }else{
 
-  user
-    .save()
-    .then(function() {
-      Response.send(user, res);
-    })
-    .catch(err => {
+        let user = new User();
+        user.email = req.body.email;
+        user.password = req.body.password;
+        user.role = 'RL-02';
+        user
+          .save()
+          .then(function() {
+            Response.send(user, res);
+          })
+          .catch(err => {
+            Response.send("", res, err);
+          });
+
+      }
+    }).catch(err => {
       Response.send("", res, err);
     });
+ 
 };
 
 exports.addKid = (req, res, next) => {
@@ -87,43 +99,29 @@ exports.delete = function(req, res) {
 };
 
 exports.login = function(req, res) {
-  try {
     const { email, password } = req.body;
     User.findOne({ email }, (err, user) => {
       if (!err && user) {
-        // We could compare passwords in our model instead of below
         bcrypt
           .compare(password, user.password)
           .then(match => {
             if (!match) {
-              throw new Error("Not authorized to access this resource");
+              Response.send("", res, "Login failed! Check authentication credentials");
             }
 
             const payload = { id: user.id };
             const options = { expiresIn: "2d", issuer: "https://scotch.io" };
             const secret = process.env.JWT_KEY;
             const token = jwt.sign(payload, secret, options);
-            res.send({ user, token });
+            Response.send({ user, token }, res);
           })
           .catch(err => {
-            console.log(err);
-            Response.send(
-              "",
-              res,
-              "Login failed! Check authentication credentials"
-            );
+            Response.send("", res, "Login failed! Check authentication credentials");
           });
       } else {
-        Response.send(
-          "",
-          res,
-          "Login failed! Check authentication credentials"
-        );
+        Response.send("", res, "Login failed! Check authentication credentials");
       }
     });
-  } catch (error) {
-    Response.send("", res, error.message);
-  }
 };
 
 exports.resetPassword = function(req, res){
@@ -178,14 +176,10 @@ exports.resetPassword = function(req, res){
 }
 
 exports.changePassword = function(req, res) {
-  try {
     User.findByIdAndUpdate(req.params.email, {
       password: req.body.password,
       content: req.body.content
   }, {new: true})
-  } catch (error) {
-    res.status(500).send(error);
-  }
 };
 
 

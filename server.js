@@ -9,7 +9,7 @@ const cors = require('cors')
 const generalController = require("./controllers/atec");
 const User = require("./models/atec");
 
-var https = require('https')
+const https = require('https')
 const app = express();
 
 const atecRoutes = require("./routes/atec");
@@ -22,20 +22,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors());
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "GET, POST, PUT, PATCH, DELETE"
-//   );
-//   res.setHeader(
-//     "Access-Control-Allow-Headers",
-//     "Content-Type",
-//     "Authorization"
-//   );
-//   next();
-// });
-
 app.use(atecRoutes);
 app.use(userRoutes);
 
@@ -52,6 +38,6 @@ mongoose
     process.exit();
   });
 
-app.listen(3001, () => {
-  console.log("Server is listening on port 3001");
+app.listen(3000, () => {
+  console.log("Server is listening on port 3000");
 });
