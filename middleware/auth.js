@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
       throw new Error("Not authorized to access this resource");
     }
   } catch (error) {
-    Response.send("", res, error.message);
+    Response.send("", res, error.message, 401);
   }
 };
 module.exports = auth;
